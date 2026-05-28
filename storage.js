@@ -7,18 +7,26 @@ export async function getCollection() {
   return data ? JSON.parse(data) : [];
 }
 
-export async function addGame(jeu, statut = "backlog") {
+export async function addGame(jeu, statut = "backlog", platforms = [], note = "") {
   const collection = await getCollection();
   const alreadyInCollection = collection.find((j) => j.id === jeu.id);
-  if (alreadyInCollection) return; // était encore "dejaDedans"
+  if (alreadyInCollection) return;
   const newGame = {
     id: jeu.id,
     name: jeu.name,
     background_image: jeu.background_image,
     rating: jeu.rating,
     statut: statut,
+    platforms: platforms,
+    note: note,
   };
-  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([...collection, newGame])); // CLE → STORAGE_KEY, nouveauJeu → newGame
+  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([...collection, newGame]));
+}
+
+export async function updateNote(id, note) {
+  const collection = await getCollection();
+  const updated = collection.map((j) => (j.id === id ? { ...j, note } : j));
+  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 }
 
 export async function updateGameStatus(id, statut) {
