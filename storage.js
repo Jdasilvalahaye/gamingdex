@@ -40,3 +40,31 @@ export async function removeGame(id) {
   const filtered = collection.filter((j) => j.id !== id);
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
 }
+
+const HISTORY_KEY = "mon_historique";
+
+export async function getHistory() {
+  const data = await AsyncStorage.getItem(HISTORY_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+export async function addToHistory(jeu, platforms = [], note = "") {
+  const history = await getHistory();
+  const alreadyIn = history.find((j) => j.id === jeu.id);
+  if (alreadyIn) return;
+  const newGame = {
+    id: jeu.id,
+    name: jeu.name,
+    background_image: jeu.background_image,
+    rating: jeu.rating,
+    platforms: platforms,
+    note: note,
+  };
+  await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify([...history, newGame]));
+}
+
+export async function removeFromHistory(id) {
+  const history = await getHistory();
+  const filtered = history.filter((j) => j.id !== id);
+  await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(filtered));
+}

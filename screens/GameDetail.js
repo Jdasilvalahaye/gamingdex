@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Modal, TextInput } from "react-native";
 import { useState } from "react";
-import { addGame } from "../storage";
+import { addGame, addToHistory } from "../storage";
 
 export default function GameDetail({ route }) {
   const { jeu } = route.params;
@@ -18,6 +18,13 @@ export default function GameDetail({ route }) {
     setModalVisible(true);
   }
 
+  function handleHistorique() {
+    setSelectedStatut("historique");
+    setSelectedPlatforms([]);
+    setNote("");
+    setModalVisible(true);
+  }
+
   function togglePlatform(platform) {
     setSelectedPlatforms((prev) =>
       prev.includes(platform) ? prev.filter((p) => p !== platform) : [...prev, platform],
@@ -25,7 +32,11 @@ export default function GameDetail({ route }) {
   }
 
   function handleConfirm() {
-    addGame(jeu, selectedStatut, selectedPlatforms, note);
+    if (selectedStatut === "historique") {
+      addToHistory(jeu, selectedPlatforms, note);
+    } else {
+      addGame(jeu, selectedStatut, selectedPlatforms, note);
+    }
     setModalVisible(false);
   }
 
@@ -52,6 +63,11 @@ export default function GameDetail({ route }) {
             </TouchableOpacity>
           ))}
         </View>
+
+        <Text style={styles.label}>Ajouter à l'historique :</Text>
+        <TouchableOpacity style={[styles.btn, styles.historique]} onPress={handleHistorique}>
+          <Text style={styles.btnTexte}>📖 J'y ai joué mais je ne l'ai plus</Text>
+        </TouchableOpacity>
       </View>
 
       <Modal visible={modalVisible} transparent animationType="slide">
@@ -109,6 +125,7 @@ const styles = StyleSheet.create({
   joué: { backgroundColor: "#4CAF50" },
   encours: { backgroundColor: "#2196F3" },
   backlog: { backgroundColor: "#FF9800" },
+  historique: { backgroundColor: "#607D8B" },
   modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
   modalBox: { backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 24 },
   modalTitre: { fontSize: 18, fontWeight: "bold", marginBottom: 16 },
