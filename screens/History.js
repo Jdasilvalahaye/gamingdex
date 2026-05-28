@@ -6,12 +6,17 @@ import { getPlatformColor } from "../platformColors";
 
 export default function History({ navigation }) {
   const [games, setGames] = useState([]);
+  const [filterPlatform, setFilterPlatform] = useState(null);
 
   useFocusEffect(
     useCallback(() => {
       getHistory().then(setGames);
     }, []),
   );
+
+  const allPlatforms = [...new Set(games.flatMap((g) => g.platforms || []))];
+
+  const filteredGames = games.filter((g) => (filterPlatform ? g.platforms?.includes(filterPlatform) : true));
 
   if (games.length === 0) {
     return (
@@ -23,36 +28,75 @@ export default function History({ navigation }) {
   }
 
   return (
-    <FlatList
-      data={games}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => (
-        <View style={styles.game}>
-          <Image source={{ uri: item.background_image }} style={styles.cover} />
-          <View style={styles.infos}>
-            <Text style={styles.gameName}>{item.name}</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.platformRow}>
-              {item.platforms?.map((p) => (
-                <View key={p} style={[styles.platformTag, { backgroundColor: getPlatformColor(p) }]}>
-                  <Text style={styles.platformTexte}>{p}</Text>
-                </View>
-              ))}
-            </ScrollView>
-            {item.note ? <Text style={styles.noteTexte}>📝 {item.note}</Text> : null}
-          </View>
-          <TouchableOpacity onPress={() => removeFromHistory(item.id).then(() => getHistory().then(setGames))}>
-            <Text style={styles.supprimer}>✕</Text>
+    <View style={styles.container}>
+      {/* Filtre par plateforme */}
+      {allPlatforms.length > 0 && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow}>
+          <TouchableOpacity
+            style={[styles.filterTag, filterPlatform === null && styles.filterTagActif]}
+            onPress={() => setFilterPlatform(null)}
+          >
+            <Text style={[styles.filterTexte, filterPlatform === null && styles.filterTexteActif]}>Toutes</Text>
           </TouchableOpacity>
-        </View>
+          {allPlatforms.map((p) => (
+            <TouchableOpacity
+              key={p}
+              style={[
+                styles.filterTag,
+                filterPlatform === p && { backgroundColor: getPlatformColor(p), borderColor: getPlatformColor(p) },
+              ]}
+              onPress={() => setFilterPlatform(filterPlatform === p ? null : p)}
+            >
+              <Text style={[styles.filterTexte, filterPlatform === p && styles.filterTexteActif]}>{p}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       )}
-    />
+
+      <FlatList
+        data={filteredGames}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.game}>
+            <Image source={{ uri: item.background_image }} style={styles.cover} />
+            <View style={styles.infos}>
+              <Text style={styles.gameName}>{item.name}</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.platformRow}>
+                {item.platforms?.map((p) => (
+                  <View key={p} style={[styles.platformTag, { backgroundColor: getPlatformColor(p) }]}>
+                    <Text style={styles.platformTexte}>{p}</Text>
+                  </View>
+                ))}
+              </ScrollView>
+              {item.note ? <Text style={styles.noteTexte}>📝 {item.note}</Text> : null}
+            </View>
+            <TouchableOpacity onPress={() => removeFromHistory(item.id).then(() => getHistory().then(setGames))}>
+              <Text style={styles.supprimer}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#fff" },
   empty: { flex: 1, alignItems: "center", justifyContent: "center", padding: 32 },
   emptyText: { fontSize: 18, fontWeight: "bold", marginBottom: 8, textAlign: "center" },
   emptySubtext: { fontSize: 14, color: "#888", textAlign: "center" },
+  filterRow: { paddingHorizontal: 12, paddingVertical: 8, flexGrow: 0 },
+  filterTag: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    marginRight: 8,
+  },
+  filterTagActif: { backgroundColor: "#2196F3", borderColor: "#2196F3" },
+  filterTexte: { fontSize: 13, color: "#888" },
+  filterTexteActif: { color: "#fff" },
   game: { flexDirection: "row", alignItems: "center", padding: 12, borderBottomWidth: 1, borderBottomColor: "#eee" },
   cover: { width: 70, height: 45, borderRadius: 6, marginRight: 12 },
   infos: { flex: 1 },
