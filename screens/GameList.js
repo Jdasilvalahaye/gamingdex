@@ -39,9 +39,14 @@ export default function GameList({ navigation }) {
         onChangeText={setSearch}
         clearButtonMode="while-editing"
       />
-      <TouchableOpacity style={styles.collectionBtn} onPress={() => navigation.navigate("Collection")}>
-        <Text style={styles.collectionBtnTexte}>📚 Ma collection</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonsRow}>
+        <TouchableOpacity style={[styles.collectionBtn, { flex: 1 }]} onPress={() => navigation.navigate("Collection")}>
+          <Text style={styles.collectionBtnTexte}>📚 Collection</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.statsBtn, { flex: 1 }]} onPress={() => navigation.navigate("Stats")}>
+          <Text style={styles.collectionBtnTexte}>📊 Stats</Text>
+        </TouchableOpacity>
+      </View>
       {loading ? (
         <Text style={styles.loading}>Chargement...</Text>
       ) : (
@@ -69,14 +74,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#f2f2f2",
     fontSize: 16,
   },
-  collectionBtn: {
-    backgroundColor: "#2196F3",
-    padding: 12,
-    marginHorizontal: 12,
-    marginBottom: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
+  buttonsRow: { flexDirection: "row", gap: 8, marginHorizontal: 12, marginBottom: 12 },
+  collectionBtn: { backgroundColor: "#2196F3", padding: 12, borderRadius: 8, alignItems: "center" },
+  statsBtn: { backgroundColor: "#9C27B0", padding: 12, borderRadius: 8, alignItems: "center" },
   collectionBtnTexte: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   loading: { textAlign: "center", marginTop: 40, color: "#888" },
   game: {
