@@ -4,7 +4,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { getHistory, removeFromHistory } from "../storage";
 import { getPlatformColor } from "../platformColors";
 
-export default function History({ navigation }) {
+export default function History() {
   const [games, setGames] = useState([]);
   const [filterPlatform, setFilterPlatform] = useState(null);
 
@@ -15,13 +15,13 @@ export default function History({ navigation }) {
   );
 
   const allPlatforms = [...new Set(games.flatMap((g) => g.platforms || []))];
-
   const filteredGames = games.filter((g) => (filterPlatform ? g.platforms?.includes(filterPlatform) : true));
 
   if (games.length === 0) {
     return (
       <View style={styles.empty}>
-        <Text style={styles.emptyText}>Aucun jeu dans l'historique 📖</Text>
+        <Text style={styles.emptyEmoji}>📖</Text>
+        <Text style={styles.emptyText}>Historique vide</Text>
         <Text style={styles.emptySubtext}>Ajoute des jeux que tu as joués mais que tu ne possèdes plus !</Text>
       </View>
     );
@@ -29,9 +29,13 @@ export default function History({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Filtre par plateforme */}
       {allPlatforms.length > 0 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.filterRow}
+          contentContainerStyle={styles.filterContent}
+        >
           <TouchableOpacity
             style={[styles.filterTag, filterPlatform === null && styles.filterTagActif]}
             onPress={() => setFilterPlatform(null)}
@@ -60,7 +64,9 @@ export default function History({ navigation }) {
           <View style={styles.game}>
             <Image source={{ uri: item.background_image }} style={styles.cover} />
             <View style={styles.infos}>
-              <Text style={styles.gameName}>{item.name}</Text>
+              <Text style={styles.gameName} numberOfLines={1}>
+                {item.name}
+              </Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.platformRow}>
                 {item.platforms?.map((p) => (
                   <View key={p} style={[styles.platformTag, { backgroundColor: getPlatformColor(p) }]}>
@@ -81,29 +87,41 @@ export default function History({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  empty: { flex: 1, alignItems: "center", justifyContent: "center", padding: 32 },
-  emptyText: { fontSize: 18, fontWeight: "bold", marginBottom: 8, textAlign: "center" },
-  emptySubtext: { fontSize: 14, color: "#888", textAlign: "center" },
-  filterRow: { paddingHorizontal: 12, paddingVertical: 8, flexGrow: 0 },
+  container: { flex: 1, backgroundColor: "#EEF4F7" },
+  empty: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#EEF4F7", padding: 32 },
+  emptyEmoji: { fontSize: 48, marginBottom: 16 },
+  emptyText: { fontSize: 18, fontWeight: "bold", color: "#1A2F3A", marginBottom: 8 },
+  emptySubtext: { fontSize: 14, color: "#6B8A99", textAlign: "center" },
+  filterRow: { flexGrow: 0 },
+  filterContent: { paddingHorizontal: 16, paddingVertical: 10, gap: 8 },
   filterTag: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#ddd",
-    marginRight: 8,
+    borderColor: "#D4E4EC",
+    backgroundColor: "#fff",
   },
   filterTagActif: { backgroundColor: "#2196F3", borderColor: "#2196F3" },
-  filterTexte: { fontSize: 13, color: "#888" },
+  filterTexte: { fontSize: 13, color: "#6B8A99" },
   filterTexteActif: { color: "#fff" },
-  game: { flexDirection: "row", alignItems: "center", padding: 12, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  cover: { width: 70, height: 45, borderRadius: 6, marginRight: 12 },
+  game: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    marginHorizontal: 16,
+    marginBottom: 8,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#D4E4EC",
+  },
+  cover: { width: 80, height: 55, borderRadius: 8, marginRight: 12, backgroundColor: "#D4E4EC" },
   infos: { flex: 1 },
-  gameName: { fontSize: 15, fontWeight: "bold", marginBottom: 4 },
+  gameName: { fontSize: 15, fontWeight: "bold", color: "#1A2F3A", marginBottom: 6 },
   platformRow: { flexGrow: 0, marginBottom: 4 },
   platformTag: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10, marginRight: 4 },
   platformTexte: { fontSize: 11, color: "#fff", fontWeight: "bold" },
-  noteTexte: { fontSize: 12, color: "#888", fontStyle: "italic" },
-  supprimer: { fontSize: 18, color: "#ccc", paddingLeft: 8 },
+  noteTexte: { fontSize: 12, color: "#6B8A99", fontStyle: "italic" },
+  supprimer: { fontSize: 16, color: "#6B8A99", paddingLeft: 8 },
 });

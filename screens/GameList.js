@@ -12,7 +12,6 @@ export default function GameList({ navigation }) {
     const timer = setTimeout(() => {
       fetchGames(search);
     }, 500);
-
     return () => clearTimeout(timer);
   }, [search]);
 
@@ -21,9 +20,8 @@ export default function GameList({ navigation }) {
     const url = query
       ? `https://api.rawg.io/api/games?key=${API_KEY}&search=${query}&page_size=20`
       : `https://api.rawg.io/api/games?key=${API_KEY}&page_size=20`;
-
     fetch(url)
-      .then((response) => response.json())
+      .then((r) => r.json())
       .then((data) => {
         setGames(data.results || []);
         setLoading(false);
@@ -32,23 +30,41 @@ export default function GameList({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Rechercher un jeu..."
-        value={search}
-        onChangeText={setSearch}
-        clearButtonMode="while-editing"
-      />
+      <View style={styles.searchContainer}>
+        <Text style={styles.searchIcon}>🔍</Text>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Rechercher un jeu..."
+          placeholderTextColor="#6B8A99"
+          value={search}
+          onChangeText={setSearch}
+          clearButtonMode="while-editing"
+        />
+      </View>
+
       {loading ? (
-        <Text style={styles.loading}>Chargement...</Text>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loading}>Chargement...</Text>
+        </View>
       ) : (
         <FlatList
           data={games}
           keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.list}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.game} onPress={() => navigation.navigate("Detail", { jeu: item })}>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => navigation.navigate("Detail", { jeu: item })}
+              activeOpacity={0.85}
+            >
               <Image source={{ uri: item.background_image }} style={styles.cover} />
-              <Text style={styles.gameName}>{item.name}</Text>
+              <View style={styles.cardOverlay} />
+              <View style={styles.cardInfos}>
+                <Text style={styles.gameName} numberOfLines={2}>
+                  {item.name}
+                </Text>
+                <Text style={styles.gameRating}>⭐ {item.rating}</Text>
+              </View>
             </TouchableOpacity>
           )}
         />
@@ -58,10 +74,31 @@ export default function GameList({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  searchBar: { margin: 12, padding: 10, borderRadius: 10, backgroundColor: "#f2f2f2", fontSize: 16 },
-  loading: { textAlign: "center", marginTop: 40, color: "#888" },
-  game: { flexDirection: "row", alignItems: "center", padding: 12, borderBottomWidth: 1, borderBottomColor: "#eee" },
-  cover: { width: 80, height: 50, borderRadius: 6, marginRight: 12 },
-  gameName: { fontSize: 16, flex: 1 },
+  container: { flex: 1, backgroundColor: "#EEF4F7" },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    margin: 16,
+    paddingHorizontal: 14,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#D4E4EC",
+  },
+  searchIcon: { fontSize: 16, marginRight: 8 },
+  searchBar: { flex: 1, paddingVertical: 12, fontSize: 16, color: "#1A2F3A" },
+  loadingContainer: { flex: 1, alignItems: "center", justifyContent: "center" },
+  loading: { color: "#6B8A99", fontSize: 16 },
+  list: { paddingHorizontal: 16, paddingBottom: 16, gap: 12 },
+  card: { height: 160, borderRadius: 16, overflow: "hidden", backgroundColor: "#D4E4EC" },
+  cover: { position: "absolute", width: "100%", height: "100%" },
+  cardOverlay: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(26,47,58,0.45)",
+  },
+  cardInfos: { position: "absolute", bottom: 0, left: 0, right: 0, padding: 14 },
+  gameName: { color: "#fff", fontSize: 16, fontWeight: "bold", marginBottom: 4 },
+  gameRating: { color: "#FFD700", fontSize: 13 },
 });

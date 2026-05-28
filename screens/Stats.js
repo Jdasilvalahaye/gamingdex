@@ -49,24 +49,24 @@ export default function Stats() {
   const topPlayedPlatforms = Object.entries(playedPlatformCount)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
-
   const totalJoués = joué + history.length;
 
   if (total === 0 && history.length === 0) {
     return (
       <View style={styles.empty}>
-        <Text style={styles.emptyText}>Aucun jeu dans ta collection 🎮</Text>
+        <Text style={styles.emptyEmoji}>📊</Text>
+        <Text style={styles.emptyText}>Aucune stat disponible</Text>
         <Text style={styles.emptySubtext}>Ajoute des jeux pour voir tes stats !</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Résumé global */}
       <Text style={styles.sectionTitre}>Résumé</Text>
       <View style={styles.cardsRow}>
-        <View style={[styles.card, { backgroundColor: "#E3F2FD" }]}>
+        <View style={[styles.card, { backgroundColor: "#DDF0F9" }]}>
           <Text style={[styles.cardNombre, { color: "#2196F3" }]}>{total}</Text>
           <Text style={styles.cardLabel}>Total</Text>
         </View>
@@ -112,7 +112,7 @@ export default function Stats() {
         </>
       )}
 
-      {/* Top plateformes collection */}
+      {/* Top plateformes */}
       {topPlatforms.length > 0 && (
         <>
           <Text style={styles.sectionTitre}>Top plateformes</Text>
@@ -137,7 +137,7 @@ export default function Stats() {
             <View key={genre} style={styles.barRow}>
               <Text style={styles.barLabel}>{genre}</Text>
               <View style={styles.barContainer}>
-                <View style={[styles.barFill, { flex: count, backgroundColor: "#9C27B0" }]} />
+                <View style={[styles.barFill, { flex: count, backgroundColor: "#7B5EA7" }]} />
                 <View style={{ flex: total - count }} />
               </View>
               <Text style={styles.barCount}>{count}</Text>
@@ -149,17 +149,17 @@ export default function Stats() {
       {/* Expériences de jeu */}
       <Text style={styles.sectionTitre}>Expériences de jeu</Text>
       <View style={styles.cardsRow}>
-        <View style={[styles.card, { backgroundColor: "#ECEFF1" }]}>
-          <Text style={[styles.cardNombre, { color: "#607D8B" }]}>{history.length}</Text>
+        <View style={[styles.card, { backgroundColor: "#E8EEF2" }]}>
+          <Text style={[styles.cardNombre, { color: "#4A7A99" }]}>{history.length}</Text>
           <Text style={styles.cardLabel}>Plus en ma possession</Text>
         </View>
-        <View style={[styles.card, { backgroundColor: "#ECEFF1" }]}>
-          <Text style={[styles.cardNombre, { color: "#607D8B" }]}>{totalJoués}</Text>
+        <View style={[styles.card, { backgroundColor: "#E8EEF2" }]}>
+          <Text style={[styles.cardNombre, { color: "#4A7A99" }]}>{totalJoués}</Text>
           <Text style={styles.cardLabel}>Total joués</Text>
         </View>
       </View>
 
-      {/* Répartition par plateforme des jeux joués */}
+      {/* Joués par plateforme */}
       {topPlayedPlatforms.length > 0 && (
         <>
           <Text style={styles.sectionTitre}>Joués par plateforme</Text>
@@ -180,32 +180,34 @@ export default function Stats() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
-  empty: { flex: 1, alignItems: "center", justifyContent: "center" },
-  emptyText: { fontSize: 18, fontWeight: "bold", marginBottom: 8 },
-  emptySubtext: { fontSize: 14, color: "#888" },
-  sectionTitre: { fontSize: 18, fontWeight: "bold", marginTop: 24, marginBottom: 12 },
+  container: { flex: 1, backgroundColor: "#EEF4F7" },
+  content: { padding: 16, paddingBottom: 40 },
+  empty: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#EEF4F7" },
+  emptyEmoji: { fontSize: 48, marginBottom: 16 },
+  emptyText: { fontSize: 18, fontWeight: "bold", color: "#1A2F3A", marginBottom: 8 },
+  emptySubtext: { fontSize: 14, color: "#6B8A99" },
+  sectionTitre: { fontSize: 17, fontWeight: "bold", color: "#1A2F3A", marginTop: 24, marginBottom: 12 },
   cardsRow: { flexDirection: "row", gap: 8 },
   card: { flex: 1, padding: 12, borderRadius: 12, alignItems: "center" },
   cardNombre: { fontSize: 28, fontWeight: "bold" },
-  cardLabel: { fontSize: 12, color: "#888", marginTop: 4 },
+  cardLabel: { fontSize: 12, color: "#6B8A99", marginTop: 4, textAlign: "center" },
   progressContainer: { marginBottom: 8 },
-  progressBar: { flexDirection: "row", height: 20, borderRadius: 10, overflow: "hidden", backgroundColor: "#f2f2f2" },
+  progressBar: { flexDirection: "row", height: 16, borderRadius: 8, overflow: "hidden", backgroundColor: "#D4E4EC" },
   progressSegment: { height: "100%" },
   legendeRow: { flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 8 },
   legende: { flexDirection: "row", alignItems: "center", gap: 4 },
   legendePuce: { width: 10, height: 10, borderRadius: 5 },
-  legendeTexte: { fontSize: 12, color: "#888" },
+  legendeTexte: { fontSize: 12, color: "#6B8A99" },
   barRow: { flexDirection: "row", alignItems: "center", marginBottom: 10, gap: 8 },
-  barLabel: { fontSize: 13, color: "#333", width: 120 },
+  barLabel: { fontSize: 13, color: "#1A2F3A", width: 120 },
   barContainer: {
     flex: 1,
     flexDirection: "row",
     height: 12,
     borderRadius: 6,
     overflow: "hidden",
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#D4E4EC",
   },
   barFill: { height: "100%", borderRadius: 6 },
-  barCount: { fontSize: 13, color: "#888", width: 24, textAlign: "right" },
+  barCount: { fontSize: 13, color: "#6B8A99", width: 24, textAlign: "right" },
 });
